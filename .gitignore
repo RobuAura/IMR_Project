@@ -58,3 +58,13 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 UpgradeLog.htm
+
+# Unity upgrade logs
+UpgradeLog.htm
+UpgradeLog*.htm
+
+# Build temporary files
+.utmp/
+[Bb]uild/
+[Bb]uilds/
+[Tt]emp/
