@@ -25,5 +25,5 @@ MonoBehaviour:
       m_GuidHigh: 5628987906704478152
     m_Size: {x: 0.21, y: 0.14999999}
     m_SpecifySize: 1
-    m_Name: EgyptFlag
+    m_Name: egypt
     m_Texture: {fileID: 2800000, guid: fe7f9667443a4424c80f1770ad2e1e4e, type: 3}
