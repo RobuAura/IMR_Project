@@ -25,5 +25,25 @@ MonoBehaviour:
       m_GuidHigh: 5628987906704478152
     m_Size: {x: 0.21, y: 0.14999999}
     m_SpecifySize: 1
-    m_Name: egypt
+    m_Name: Egypt
     m_Texture: {fileID: 2800000, guid: fe7f9667443a4424c80f1770ad2e1e4e, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5381534940561350993
+      m_GuidHigh: 6915089304469691572
+    m_SerializedTextureGuid:
+      m_GuidLow: 12706061117491619301
+      m_GuidHigh: 2691793808790065834
+    m_Size: {x: 0.21, y: 0.14999999}
+    m_SpecifySize: 1
+    m_Name: France
+    m_Texture: {fileID: 2800000, guid: 4a7da5e5ff44b054aa128715352c5b25, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5302519197773669624
+      m_GuidHigh: 2379294948146153098
+    m_SerializedTextureGuid:
+      m_GuidLow: 10278477878129956437
+      m_GuidHigh: 136611013117442008
+    m_Size: {x: 0.21, y: 0.14999999}
+    m_SpecifySize: 1
+    m_Name: Brazil
+    m_Texture: {fileID: 2800000, guid: 25a596557d2c8ea4d877451dfe56e501, type: 3}

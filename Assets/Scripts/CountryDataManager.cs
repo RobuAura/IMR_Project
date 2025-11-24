@@ -31,7 +31,6 @@ public class CountryDataManager : MonoBehaviour
         }
     }
 
-    // Salveaza ca o tara a fost descoperita
     public void UnlockCountry(string countryName)
     {
         PlayerPrefs.SetInt(countryName + "_Unlocked", 1);
@@ -39,13 +38,11 @@ public class CountryDataManager : MonoBehaviour
         Debug.Log("Tara descoperita: " + countryName);
     }
 
-    // Verifica daca o tara e descoperita
     public bool IsCountryUnlocked(string countryName)
     {
         return PlayerPrefs.GetInt(countryName + "_Unlocked", 0) == 1;
     }
 
-    // Reset (pentru testare)
     public void ResetAllProgress()
     {
         PlayerPrefs.DeleteAll();

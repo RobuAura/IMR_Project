@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ARObjController : MonoBehaviour
 {
@@ -9,31 +11,43 @@ public class ARObjController : MonoBehaviour
     private float initialRotationY;
     private float initialScale;
 
-    public float rotationSpeed = 2f;
+    public float rotationSpeed = 0.5f;
     public float minScale = 0.2f;
     public float maxScale = 3.0f;
-    public bool faceUser = true;
+    public float initialYRotation = 0f;
+
+    [Header("Reset Settings")]
+    public Vector3 defaultScale = new Vector3(1, 1, 1);
+
+    private bool hasInitialRotation = false;
 
     private SimpleFunFact funFactManager;
     private bool hasShownFact = false;
 
+    void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+        ResetToInitialState();
+    }
+
+    void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+        hasInitialRotation = false;
+        hasShownFact = false;
+    }
+
     void Start()
     {
         trackedImage = GetComponentInParent<ARTrackedImage>();
-        if (trackedImage == null)
-        {
-            Debug.LogError("ARTrackedImage nu a fost gasit!");
-        }
         initialScale = transform.localScale.x;
 
-        NotifyButtonManager();
+        if (defaultScale == Vector3.one)
+        {
+            defaultScale = transform.localScale;
+        }
 
         funFactManager = FindObjectOfType<SimpleFunFact>();
-    }
-
-    void OnEnable()
-    {
-        NotifyButtonManager();
     }
 
     void Update()
@@ -47,23 +61,21 @@ public class ARObjController : MonoBehaviour
         if (trackedImage.trackingState != UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
             return;
 
-     
-        if (faceUser)
+        if (!hasInitialRotation)
         {
-            FaceCamera();
+            SetInitialOrientation();
+            hasInitialRotation = true;
         }
 
         HandleTouchInput();
 
-        if (trackedImage != null &&
-        trackedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking &&
-        !hasShownFact)
+        if (!hasShownFact)
         {
             ShowFunFactForTargetCountry();
         }
     }
 
-    void FaceCamera()
+    void SetInitialOrientation()
     {
         if (Camera.main != null)
         {
@@ -72,110 +84,78 @@ public class ARObjController : MonoBehaviour
 
             if (directionToCamera != Vector3.zero)
             {
-                transform.rotation = Quaternion.LookRotation(directionToCamera);
+                float yRotation = Quaternion.LookRotation(directionToCamera).eulerAngles.y;
+                transform.rotation = Quaternion.Euler(0, yRotation + initialYRotation, 0);
             }
         }
+    }
+
+    void ResetToInitialState()
+    {
+        transform.localScale = defaultScale;
+        hasInitialRotation = false;
+        hasShownFact = false;
     }
 
     void HandleTouchInput()
     {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
+        var touches = Touch.activeTouches;
 
-            if (touch.phase == TouchPhase.Began)
+        if (touches.Count == 0) return;
+
+        var touch = touches[0];
+
+        if (touches.Count == 1)
+        {
+            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
             {
-                Ray ray = Camera.main.ScreenPointToRay(touch.position);
+                Ray ray = Camera.main.ScreenPointToRay(touch.screenPosition);
                 RaycastHit hit;
 
-                if (Physics.Raycast(ray, out hit) && hit.transform == transform)
+                if (Physics.Raycast(ray, out hit))
                 {
-                    isSelected = true;
-                    initialTouchPosition = touch.position;
-                    initialRotationY = transform.rotation.eulerAngles.y;
-                    initialScale = transform.localScale.x;
+                    if (hit.transform == transform || hit.transform.IsChildOf(transform) || transform.IsChildOf(hit.transform.root))
+                    {
+                        isSelected = true;
+                        initialTouchPosition = touch.screenPosition;
+                        initialRotationY = transform.rotation.eulerAngles.y;
+                    }
                 }
             }
 
-            if (isSelected)
+            if (isSelected && touch.phase == UnityEngine.InputSystem.TouchPhase.Moved)
             {
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    if (Input.touchCount == 1)
-                    {
-                        float deltaX = touch.position.x - initialTouchPosition.x;
-                        float newRotationY = initialRotationY + deltaX * rotationSpeed;
-                        faceUser = false;
-                        transform.rotation = Quaternion.Euler(0, newRotationY, 0);
-                    }
-                    else if (Input.touchCount == 2)
-                    {
-                        Touch touch1 = Input.GetTouch(0);
-                        Touch touch2 = Input.GetTouch(1);
+                float deltaX = touch.screenPosition.x - initialTouchPosition.x;
+                float newRotationY = initialRotationY + deltaX * rotationSpeed;
+                transform.rotation = Quaternion.Euler(0, newRotationY, 0);
+            }
 
-                        Vector2 touch1PrevPos = touch1.position - touch1.deltaPosition;
-                        Vector2 touch2PrevPos = touch2.position - touch2.deltaPosition;
-
-                        float prevDistance = Vector2.Distance(touch1PrevPos, touch2PrevPos);
-                        float currentDistance = Vector2.Distance(touch1.position, touch2.position);
-
-                        float scaleFactor = currentDistance / prevDistance;
-                        float newScale = initialScale * scaleFactor;
-
-                        newScale = Mathf.Clamp(newScale, minScale, maxScale);
-                        transform.localScale = Vector3.one * newScale;
-                    }
-                }
-
-                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
-                {
-                    isSelected = false;
-                }
+            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Ended ||
+                touch.phase == UnityEngine.InputSystem.TouchPhase.Canceled)
+            {
+                isSelected = false;
             }
         }
-    }
 
-   
-    public void RotateLeft()
-    {
-        faceUser = false;
-        transform.Rotate(0, -45, 0);
-        Debug.Log("Rotire stanga aplicata");
-    }
-
-    public void RotateRight()
-    {
-        faceUser = false;
-        transform.Rotate(0, 45, 0);
-        Debug.Log("Rotire dreapta aplicata");
-    }
-
-    public void ScaleUp()
-    {
-        float newScale = Mathf.Clamp(transform.localScale.x * 1.3f, minScale, maxScale);
-        transform.localScale = Vector3.one * newScale;
-        Debug.Log("Marire aplicata. Noua scala: " + newScale);
-    }
-
-    public void ScaleDown()
-    {
-        float newScale = Mathf.Clamp(transform.localScale.x * 0.7f, minScale, maxScale);
-        transform.localScale = Vector3.one * newScale;
-        Debug.Log("Micsorare aplicata. Noua scala: " + newScale);
-    }
-
-    public void ResetOrientation()
-    {
-        faceUser = true;
-        Debug.Log("Orientare resetata");
-    }
-
-    void NotifyButtonManager()
-    {
-        ARButtonManager buttonManager = FindObjectOfType<ARButtonManager>();
-        if (buttonManager != null)
+        if (touches.Count == 2)
         {
-            buttonManager.SetCurrentARObject(this);
+            var touch1 = touches[0];
+            var touch2 = touches[1];
+
+            Vector2 touch1PrevPos = touch1.screenPosition - touch1.delta;
+            Vector2 touch2PrevPos = touch2.screenPosition - touch2.delta;
+
+            float prevDistance = Vector2.Distance(touch1PrevPos, touch2PrevPos);
+            float currentDistance = Vector2.Distance(touch1.screenPosition, touch2.screenPosition);
+
+            if (prevDistance > 0)
+            {
+                float scaleFactor = currentDistance / prevDistance;
+                float newScale = transform.localScale.x * scaleFactor;
+
+                newScale = Mathf.Clamp(newScale, minScale, maxScale);
+                transform.localScale = Vector3.one * newScale;
+            }
         }
     }
 
@@ -183,7 +163,6 @@ public class ARObjController : MonoBehaviour
     {
         if (funFactManager != null && trackedImage != null)
         {
-            
             funFactManager.OnImageDetected(trackedImage.referenceImage.name);
             hasShownFact = true;
         }

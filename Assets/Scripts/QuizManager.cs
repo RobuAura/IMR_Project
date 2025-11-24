@@ -104,7 +104,6 @@ public class QuizManager : MonoBehaviour
 
     void ShowFinalScore()
     {
-        // Ascunde tot UI-ul de quiz
         flagImage.gameObject.SetActive(false);
         questionText.gameObject.SetActive(false);
         nextButton.gameObject.SetActive(false);
@@ -116,7 +115,6 @@ public class QuizManager : MonoBehaviour
             btn.gameObject.SetActive(false);
         }
 
-        // Aratã panoul cu scorul final
         finalScorePanel.SetActive(true);
         finalScoreText.text = "Quiz Completed!\n\nYour Score:\n" + score + "/" + questions.Length;
     }

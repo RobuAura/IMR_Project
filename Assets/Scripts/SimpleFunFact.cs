@@ -1,55 +1,82 @@
 using UnityEngine;
 using TMPro;
 
+[System.Serializable]
+public class CountryFunFact
+{
+    public string countryName;
+    public string funFact;
+}
+
 public class SimpleFunFact : MonoBehaviour
 {
     public GameObject funFactPanel;
     public TextMeshProUGUI funFactText;
+    public CountryFunFact[] countries;
 
-    public string targetCountry = "Egypt";
-
-    public string funFact = " The Pyramid of Khufu at Giza is the largest Egyptian pyramid. This incredible structure weighs as much as 16 Empire State buildings!";
-
-    private bool hasUnlocked = false;
+    private string currentCountry = "";
 
     void Start()
     {
-        
         if (funFactPanel != null)
             funFactPanel.SetActive(false);
     }
 
-    // Metoda apelata cand o imagine este detectata
     public void OnImageDetected(string imageName)
     {
-       
-        if (imageName == targetCountry)
-        {
-            ShowFunFact();
+        if (currentCountry == imageName) return;
 
-            if (!hasUnlocked)
+        foreach (var country in countries)
+        {
+            if (country.countryName == imageName)
             {
-                CountryDataManager.Instance.UnlockCountry(targetCountry);
-                hasUnlocked = true;
+                ShowFunFact(country.funFact, imageName);
+
+                CountryDataManager.Instance.UnlockCountry(imageName);
+                break;
             }
         }
     }
 
-    void ShowFunFact()
+    void ShowFunFact(string fact, string countryName)
     {
-        if (funFactText != null)
-            funFactText.text = funFact;
+        currentCountry = countryName;
 
+        if (funFactText != null)
+            funFactText.text = fact;
         if (funFactPanel != null)
             funFactPanel.SetActive(true);
 
-        Debug.Log("Fun fact afisat pentru: " + targetCountry);
+        SoundManager soundManager = FindObjectOfType<SoundManager>();
+        if (soundManager != null)
+        {
+            soundManager.ShowSoundButton(countryName);
+        }
+
+        CountryInfoManager infoManager = FindObjectOfType<CountryInfoManager>();
+        if (infoManager != null)
+        {
+            infoManager.ShowCountryInfo(countryName);
+        }
     }
 
-   
     public void HideFunFact()
     {
+        currentCountry = "";
+
         if (funFactPanel != null)
             funFactPanel.SetActive(false);
+
+        SoundManager soundManager = FindObjectOfType<SoundManager>();
+        if (soundManager != null)
+        {
+            soundManager.HideSoundButton();
+        }
+
+        CountryInfoManager infoManager = FindObjectOfType<CountryInfoManager>();
+        if (infoManager != null)
+        {
+            infoManager.HideCountryInfo();
+        }
     }
 }

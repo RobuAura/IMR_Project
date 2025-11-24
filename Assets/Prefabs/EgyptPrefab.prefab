@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8777117564453835355}
-  - component: {fileID: 8206066273739725575}
+  - component: {fileID: 8461437923606725792}
+  - component: {fileID: 6258081790256561034}
   m_Layer: 0
   m_Name: EgyptPrefab
   m_TagString: Untagged
@@ -33,7 +34,7 @@ Transform:
   - {fileID: 8827141896333851497}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8206066273739725575
+--- !u!114 &8461437923606725792
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,10 +43,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 3182273603902574594}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d3db31bbb5403849881c1de3f2f5d59, type: 3}
+  m_Script: {fileID: 11500000, guid: 78e102dfa94af65489880bf63772f600, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DestroyOnRemoval: 1
+  renderQueue: 3000
+  applyToChildren: 1
+--- !u!114 &6258081790256561034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3182273603902574594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ffcdda714580c429aeee15e3330413, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 2
+  minScale: 0.1
+  maxScale: 1
+  initialYRotation: 0
+  defaultScale: {x: 0.1, y: 0.1, z: 0.1}
 --- !u!1001 &8265504149955807951
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -57,6 +76,10 @@ PrefabInstance:
     - target: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
       propertyPath: m_Name
       value: Sights_Egipt
+      objectReference: {fileID: 0}
+    - target: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
       propertyPath: m_IsActive
@@ -114,6 +137,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1399629006470691388, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1765299104252922569, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1765299104252922569, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
       propertyPath: m_RenderingLayerMask
       value: 1
@@ -124,34 +155,15 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6513312767418522650}
-    - targetCorrespondingSourceObject: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4875097165883800588}
+      addedObject: {fileID: 6507969237744209779}
   m_SourcePrefab: {fileID: 100100000, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
 --- !u!1 &8199821706446119379 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 252032660650601244, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}
   m_PrefabInstance: {fileID: 8265504149955807951}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6513312767418522650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8199821706446119379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9ffcdda714580c429aeee15e3330413, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationSpeed: 2
-  minScale: 0.05
-  maxScale: 2
-  faceUser: 1
---- !u!64 &4875097165883800588
-MeshCollider:
+--- !u!65 &6507969237744209779
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -168,10 +180,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6552848129101844737, guid: b69d9b99edb2c2d4fb76859a16cb8d9b, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 13.107528, y: 8.603706, z: 13.320377}
+  m_Center: {x: 0.5327726, y: 0.9830234, z: 0.11629893}
 --- !u!4 &8827141896333851497 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 591298601646322086, guid: 9a609fd6684baa34da28b1fad8c37bed, type: 3}

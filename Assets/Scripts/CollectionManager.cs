@@ -17,9 +17,15 @@ public class CollectionManager : MonoBehaviour
 
     public CountryCard[] countries;
 
+    [Header("Trophy Card")]
+    public GameObject trophyCardPanel;
+    public TextMeshProUGUI trophyStatusText;
+    public GameObject trophyLockedOverlay;
+
     void Start()
     {
         UpdateAllCards();
+        UpdateTrophy();
     }
 
     void UpdateAllCards()
@@ -30,27 +36,100 @@ public class CollectionManager : MonoBehaviour
 
             if (isUnlocked)
             {
-                // Tara descoperita
                 country.statusText.text = "Discovered";
                 country.statusText.color = Color.green;
 
                 if (country.lockedOverlay != null)
                     country.lockedOverlay.SetActive(false);
 
-                country.flagImage.color = Color.white; 
+                country.flagImage.color = Color.white;
             }
             else
             {
-                // Tara blocata
                 country.statusText.text = "Locked";
                 country.statusText.color = Color.grey;
 
                 if (country.lockedOverlay != null)
                     country.lockedOverlay.SetActive(true);
 
-                country.flagImage.color = new Color(0.3f, 0.3f, 0.3f); 
+                country.flagImage.color = new Color(0.3f, 0.3f, 0.3f);
             }
         }
+    }
+
+    void UpdateTrophy()
+    {
+        bool allUnlocked = AreAllCountriesUnlocked();
+
+        if (allUnlocked)
+        {
+            if (trophyStatusText != null)
+            {
+                trophyStatusText.text = "Master Explorer!";
+                trophyStatusText.color = new Color(1f, 0.84f, 0f);
+            }
+
+            if (trophyLockedOverlay != null)
+                trophyLockedOverlay.SetActive(false);
+
+            CountryDataManager.Instance.UnlockCountry("Trophy");
+
+            Debug.Log("TROFEU DEBLOCAT!");
+        }
+        else
+        {
+            if (trophyStatusText != null)
+            {
+                int unlocked = CountUnlockedCountries();
+                trophyStatusText.text = unlocked + "/" + countries.Length + " countries";
+                trophyStatusText.color = Color.grey;
+            }
+
+            if (trophyLockedOverlay != null)
+                trophyLockedOverlay.SetActive(true);
+        }
+    }
+
+    bool AreAllCountriesUnlocked()
+    {
+        foreach (CountryCard country in countries)
+        {
+            if (!CountryDataManager.Instance.IsCountryUnlocked(country.countryName))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int CountUnlockedCountries()
+    {
+        int count = 0;
+        foreach (CountryCard country in countries)
+        {
+            if (CountryDataManager.Instance.IsCountryUnlocked(country.countryName))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void UnlockAll()
+    {
+        foreach (CountryCard country in countries)
+        {
+            CountryDataManager.Instance.UnlockCountry(country.countryName);
+        }
+        UpdateAllCards();
+        UpdateTrophy();
+    }
+
+    public void ResetProgress()
+    {
+        CountryDataManager.Instance.ResetAllProgress();
+        UpdateAllCards();
+        UpdateTrophy();
     }
 
     public void BackToARScan()
