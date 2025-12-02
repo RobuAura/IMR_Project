@@ -14,3 +14,11 @@ Tema 6
 -quiz cu 3 intrebari
 
 https://youtube.com/shorts/8xypC8Is4_4
+
+Demo - Partial
+https://youtube.com/shorts/z1RF3OIiTxo
+
+Demo saptamana 10 
+-am modelat obiectele pentru Egipt si Brazilia
+
+https://youtube.com/shorts/F6i3SbLpd8M
