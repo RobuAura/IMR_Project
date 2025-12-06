@@ -1222,6 +1222,10 @@ MonoBehaviour:
     prefab: {fileID: 7481277638053820067, guid: 0886b287def98084eba6166388942cd2, type: 3}
   - countryName: Brazil
     prefab: {fileID: 8234977431391993063, guid: 93acd24bd1c4fdd49a1a753afffc33d8, type: 3}
+  - countryName: Netherlands
+    prefab: {fileID: 2221810245760691914, guid: e5d6d0f6e9d378a43960760f2a62f28f, type: 3}
+  - countryName: Japan
+    prefab: {fileID: 5721017790578230482, guid: 5a7f45747f7fbbc4489a537cc06be8b9, type: 3}
 --- !u!1 &557233734
 GameObject:
   m_ObjectHideFlags: 0
@@ -1852,6 +1856,12 @@ MonoBehaviour:
   - countryName: Brazil
     displayName: Brazil
     capital: "Bras\xEDlia"
+  - countryName: Netherlands
+    displayName: Netherlands
+    capital: Amsterdam
+  - countryName: Japan
+    displayName: Japan
+    capital: Tokyo
 --- !u!4 &1282125217
 Transform:
   m_ObjectHideFlags: 0
@@ -1935,6 +1945,10 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: e434c718d4031fa478b2a4d4d3abb21b, type: 3}
   - countryName: Brazil
     audioClip: {fileID: 8300000, guid: e32ee2aabcee9f447a1913295a9fcf43, type: 3}
+  - countryName: Netherlands
+    audioClip: {fileID: 8300000, guid: ca79ae4f037021748b499cc9771b6ffd, type: 3}
+  - countryName: Japan
+    audioClip: {fileID: 8300000, guid: e0d70a17b2c897c40b6882122b08f4ac, type: 3}
   soundButton: {fileID: 12294238}
   soundButtonObject: {fileID: 12294234}
 --- !u!4 &1363446620
@@ -2520,6 +2534,12 @@ MonoBehaviour:
     funFact: Brazil is home to the Amazon Rainforest, which produces 20% of the world's
       oxygen! The Christ the Redeemer statue in Rio de Janeiro is one of the New
       Seven Wonders of the World.
+  - countryName: Netherlands
+    funFact: The Netherlands has more bicycles than people! With over 23 million
+      bikes for 17 million residents, cycling is the main mode of transport.
+  - countryName: Japan
+    funFact: Japan has over 6,800 islands! Mount Fuji stands at 3,776 meters as the
+      country's tallest peak.
 --- !u!4 &1963396586
 Transform:
   m_ObjectHideFlags: 0

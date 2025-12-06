@@ -47,3 +47,23 @@ MonoBehaviour:
     m_SpecifySize: 1
     m_Name: Brazil
     m_Texture: {fileID: 2800000, guid: 25a596557d2c8ea4d877451dfe56e501, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5403736970399353185
+      m_GuidHigh: 9980992099121692342
+    m_SerializedTextureGuid:
+      m_GuidLow: 17732075569240069762
+      m_GuidHigh: 5448035020425561803
+    m_Size: {x: 0.21, y: 0.14999999}
+    m_SpecifySize: 1
+    m_Name: Netherlands
+    m_Texture: {fileID: 2800000, guid: 1aefd682fcc8f614cb865a74fc4e9b4b, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5371910473140941520
+      m_GuidHigh: 7833523519731659154
+    m_SerializedTextureGuid:
+      m_GuidLow: 5338162623616410667
+      m_GuidHigh: 3217388812045869946
+    m_Size: {x: 0.21, y: 0.14999999}
+    m_SpecifySize: 1
+    m_Name: Japan
+    m_Texture: {fileID: 2800000, guid: 95ec642bf69f4a147a634ffe1376a62c, type: 3}
