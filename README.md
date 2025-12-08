@@ -22,3 +22,10 @@ Demo saptamana 10
 -am modelat obiectele pentru Egipt si Brazilia
 
 https://youtube.com/shorts/F6i3SbLpd8M
+
+
+Demo saptamana 11
+-am adaugat steagul pentru Olanda si Japonia
+-am modelat obiectul pentru Olanda
+
+https://youtube.com/shorts/m0gtVQ-6VfI
