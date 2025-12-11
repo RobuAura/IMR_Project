@@ -35,6 +35,12 @@ public class ARObjController : MonoBehaviour
         EnhancedTouchSupport.Disable();
         hasInitialRotation = false;
         hasShownFact = false;
+
+        CardDetailController cardController = FindObjectOfType<CardDetailController>();
+        if (cardController != null)
+        {
+            cardController.HideCardButton();
+        }
     }
 
     void Start()
@@ -95,6 +101,12 @@ public class ARObjController : MonoBehaviour
         transform.localScale = defaultScale;
         hasInitialRotation = false;
         hasShownFact = false;
+
+        CardDetailController cardController = FindObjectOfType<CardDetailController>();
+        if (cardController != null)
+        {
+            cardController.HideCardButton();
+        }
     }
 
     void HandleTouchInput()
@@ -163,8 +175,15 @@ public class ARObjController : MonoBehaviour
     {
         if (funFactManager != null && trackedImage != null)
         {
-            funFactManager.OnImageDetected(trackedImage.referenceImage.name);
+            string countryName = trackedImage.referenceImage.name;
+            funFactManager.OnImageDetected(countryName);
             hasShownFact = true;
+
+            CardDetailController cardController = FindObjectOfType<CardDetailController>();
+            if (cardController != null)
+            {
+                cardController.ShowCardButton(countryName);
+            }
         }
     }
 }
