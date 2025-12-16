@@ -29,3 +29,11 @@ Demo saptamana 11
 -am modelat obiectul pentru Olanda
 
 https://youtube.com/shorts/m0gtVQ-6VfI
+
+
+Demo saptamana 12
+
+-cardurile steagurilor contin un mini-joc de descoperire: trebuie sa gasesti cele doua obiecte din jurul steagului care ofera informatii noi despre tara respectiva
+
+
+https://youtube.com/shorts/rZbHUZ_tuTk
