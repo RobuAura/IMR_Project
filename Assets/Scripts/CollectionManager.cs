@@ -136,4 +136,19 @@ public class CollectionManager : MonoBehaviour
     {
         SceneManager.LoadScene("ARScanScene");
     }
+
+    public void OpenTrophyAR()
+    {
+        bool isUnlocked = CountryDataManager.Instance.IsCountryUnlocked("Trophy");
+
+        if (isUnlocked)
+        {
+            SceneManager.LoadScene("ARTrophyScene");
+            Debug.Log("Opening AR Trophy Scene...");
+        }
+        else
+        {
+            Debug.Log("Trophy still locked! Discover all countries first.");
+        }
+    }
 }
