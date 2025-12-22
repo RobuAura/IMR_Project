@@ -11,33 +11,59 @@ public class QuizManager : MonoBehaviour
     public Button[] answerButtons;
     public Button nextButton;
     public TextMeshProUGUI scoreText;
-    public GameObject funFactPanel;
-    public TextMeshProUGUI funFactText;
 
     [Header("Final Score UI")]
     public GameObject finalScorePanel;
     public TextMeshProUGUI finalScoreText;
+    public TextMeshProUGUI perfectScoresText;
     public Button backToMenuButton;
+    public Button retryButton;
 
     [Header("Quiz Data")]
-    public Question[] questions;
+    public Question[] allQuestions;
+    public int questionsPerQuiz = 10;
 
+    private Question[] currentQuestions;
     private int currentQuestionIndex = 0;
     private int score = 0;
     private bool hasAnswered = false;
 
     void Start()
     {
+        currentQuestions = GetRandomQuestions(questionsPerQuiz);
         nextButton.interactable = false;
         finalScorePanel.SetActive(false);
-        funFactPanel.SetActive(false);
         LoadQuestion();
         UpdateScoreUI();
     }
 
+    Question[] GetRandomQuestions(int count)
+    {
+        if (count > allQuestions.Length)
+        {
+            count = allQuestions.Length;
+        }
+
+        Question[] shuffled = new Question[allQuestions.Length];
+        System.Array.Copy(allQuestions, shuffled, allQuestions.Length);
+
+        for (int i = 0; i < shuffled.Length; i++)
+        {
+            int randomIndex = Random.Range(i, shuffled.Length);
+            Question temp = shuffled[i];
+            shuffled[i] = shuffled[randomIndex];
+            shuffled[randomIndex] = temp;
+        }
+
+        Question[] selected = new Question[count];
+        System.Array.Copy(shuffled, selected, count);
+
+        return selected;
+    }
+
     void LoadQuestion()
     {
-        if (currentQuestionIndex >= questions.Length)
+        if (currentQuestionIndex >= currentQuestions.Length)
         {
             ShowFinalScore();
             return;
@@ -45,11 +71,20 @@ public class QuizManager : MonoBehaviour
 
         hasAnswered = false;
         nextButton.interactable = false;
-        funFactPanel.SetActive(false);
 
-        Question currentQuestion = questions[currentQuestionIndex];
+        Question currentQuestion = currentQuestions[currentQuestionIndex];
 
-        flagImage.sprite = currentQuestion.flagImage;
+        if (currentQuestion.flagImage != null)
+        {
+            flagImage.gameObject.SetActive(true);
+            flagImage.sprite = currentQuestion.flagImage;
+        }
+        else
+        {
+            flagImage.gameObject.SetActive(false);
+        }
+
+
         questionText.text = currentQuestion.questionText;
 
         for (int i = 0; i < answerButtons.Length; i++)
@@ -67,7 +102,7 @@ public class QuizManager : MonoBehaviour
         if (hasAnswered) return;
 
         hasAnswered = true;
-        Question currentQuestion = questions[currentQuestionIndex];
+        Question currentQuestion = currentQuestions[currentQuestionIndex];
 
         if (answerIndex == currentQuestion.correctAnswerIndex)
         {
@@ -84,9 +119,7 @@ public class QuizManager : MonoBehaviour
         {
             btn.interactable = false;
         }
-
-        funFactPanel.SetActive(true);
-        funFactText.text = currentQuestion.funFact;
+        
         nextButton.interactable = true;
         UpdateScoreUI();
     }
@@ -99,7 +132,7 @@ public class QuizManager : MonoBehaviour
 
     void UpdateScoreUI()
     {
-        scoreText.text = "Score: " + score + "/" + questions.Length;
+        scoreText.text = "Score: " + score + "/" + currentQuestions.Length;
     }
 
     void ShowFinalScore()
@@ -108,7 +141,6 @@ public class QuizManager : MonoBehaviour
         questionText.gameObject.SetActive(false);
         nextButton.gameObject.SetActive(false);
         scoreText.gameObject.SetActive(false);
-        funFactPanel.SetActive(false);
 
         foreach (Button btn in answerButtons)
         {
@@ -116,11 +148,39 @@ public class QuizManager : MonoBehaviour
         }
 
         finalScorePanel.SetActive(true);
-        finalScoreText.text = "Quiz Completed!\n\nYour Score:\n" + score + "/" + questions.Length;
+
+        int perfectScores = PlayerPrefs.GetInt("PerfectScores", 0);
+
+        if (score == currentQuestions.Length)
+        {
+            perfectScores++;
+            PlayerPrefs.SetInt("PerfectScores", perfectScores);
+        }
+
+        PlayerPrefs.Save();
+        finalScoreText.text = "Quiz Completed!\n\nYour Score: " + score + "/" + currentQuestions.Length;
+
+        if (perfectScores == 0)
+        {
+            perfectScoresText.text = "No perfect scores yet. Keep trying!";
+        }
+        else if (perfectScores == 1)
+        {
+            perfectScoresText.text = "First perfect score achieved!";
+        }
+        else
+        {
+            perfectScoresText.text = "Perfect scores: " + perfectScores + " times!";
+        }
     }
 
     public void BackToMenu()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void RetryQuiz()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
