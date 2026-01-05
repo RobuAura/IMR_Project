@@ -37,3 +37,18 @@ Demo saptamana 12
 
 
 https://youtube.com/shorts/rZbHUZ_tuTk
+
+
+Demo saptamana 13
+
+
+-sunt 30 de intrebari in total; la fiecare quiz sunt alese random 10 intrebari
+
+
+https://youtube.com/shorts/1QLTk7T8g10
+
+
+-am modelat trofeul care poate fi accesat doar dupa ce sunt descoperite toate steagurile 
+
+
+https://youtube.com/shorts/w-INeZec4uk
