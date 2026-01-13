@@ -22,6 +22,9 @@ public class CollectionManager : MonoBehaviour
     public TextMeshProUGUI trophyStatusText;
     public GameObject trophyLockedOverlay;
 
+    [Header("Reset Button")]
+    public GameObject resetCollectionButton;
+
     void Start()
     {
         UpdateAllCards();
@@ -72,6 +75,9 @@ public class CollectionManager : MonoBehaviour
             if (trophyLockedOverlay != null)
                 trophyLockedOverlay.SetActive(false);
 
+            if (resetCollectionButton != null) 
+                resetCollectionButton.SetActive(true);
+
             CountryDataManager.Instance.UnlockCountry("Trophy");
 
             Debug.Log("TROFEU DEBLOCAT!");
@@ -87,6 +93,9 @@ public class CollectionManager : MonoBehaviour
 
             if (trophyLockedOverlay != null)
                 trophyLockedOverlay.SetActive(true);
+
+            if (resetCollectionButton != null)
+                resetCollectionButton.SetActive(false);
         }
     }
 

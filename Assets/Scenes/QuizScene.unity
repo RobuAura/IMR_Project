@@ -2352,7 +2352,7 @@ MonoBehaviour:
   retryButton: {fileID: 295054165}
   allQuestions:
   - flagImage: {fileID: 0}
-    questionText: How many tulip bulbs does the Netherlands produce annually
+    questionText: How many tulip bulbs does the Netherlands produce annually?
     answers:
     - 1 billion bulbs
     - 4 billion bulbs
