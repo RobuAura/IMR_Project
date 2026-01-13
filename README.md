@@ -52,3 +52,14 @@ https://youtube.com/shorts/1QLTk7T8g10
 
 
 https://youtube.com/shorts/w-INeZec4uk
+
+
+Demo saptamana 14
+
+-buton de resetare pentru colectie
+
+https://youtube.com/shorts/sD01hZyL7sE
+
+-am modificat materialul trofeului
+
+https://youtube.com/shorts/EaxtN2SeRkc
