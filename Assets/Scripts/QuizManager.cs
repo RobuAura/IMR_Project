@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using DG.Tweening;
 
 public class QuizManager : MonoBehaviour
 {
@@ -22,6 +23,11 @@ public class QuizManager : MonoBehaviour
     [Header("Quiz Data")]
     public Question[] allQuestions;
     public int questionsPerQuiz = 10;
+
+    [Header("Animation Settings")]
+    public float correctPulseDuration = 0.4f;
+    public float wrongShakeDuration = 0.5f;
+    public float shakeStrength = 20f;
 
     private Question[] currentQuestions;
     private int currentQuestionIndex = 0;
@@ -94,6 +100,8 @@ public class QuizManager : MonoBehaviour
 
             answerButtons[i].GetComponent<Image>().color = new Color(0.29f, 0.56f, 0.89f);
             answerButtons[i].interactable = true;
+
+            answerButtons[i].transform.localScale = Vector3.one;
         }
     }
 
@@ -106,13 +114,13 @@ public class QuizManager : MonoBehaviour
 
         if (answerIndex == currentQuestion.correctAnswerIndex)
         {
-            answerButtons[answerIndex].GetComponent<Image>().color = Color.green;
+            AnimateCorrectAnswer(answerButtons[answerIndex]);
             score++;
         }
         else
         {
-            answerButtons[answerIndex].GetComponent<Image>().color = Color.red;
-            answerButtons[currentQuestion.correctAnswerIndex].GetComponent<Image>().color = Color.green;
+            AnimateWrongAnswer(answerButtons[answerIndex]);
+            AnimateCorrectAnswer(answerButtons[currentQuestion.correctAnswerIndex]);
         }
 
         foreach (Button btn in answerButtons)
@@ -122,6 +130,33 @@ public class QuizManager : MonoBehaviour
         
         nextButton.interactable = true;
         UpdateScoreUI();
+    }
+
+    void AnimateCorrectAnswer(Button button)
+    {
+        Image img = button.GetComponent<Image>();
+        img.color = Color.green;
+
+        button.transform.DOKill();
+
+        Sequence pulseSeq = DOTween.Sequence();
+        pulseSeq.Append(button.transform.DOScale(Vector3.one * 1.2f, correctPulseDuration * 0.5f).SetEase(Ease.OutQuad));
+        pulseSeq.Append(button.transform.DOScale(Vector3.one, correctPulseDuration * 0.5f).SetEase(Ease.InQuad));
+
+        Debug.Log("Correct answer pulse animation!");
+    }
+
+    void AnimateWrongAnswer(Button button)
+    {
+        Image img = button.GetComponent<Image>();
+        img.color = Color.red;
+
+        button.transform.DOKill();
+
+        button.transform.DOShakePosition(wrongShakeDuration, new Vector3(shakeStrength, 0, 0), 10, 90, false, true)
+            .SetEase(Ease.InOutQuad);
+
+        Debug.Log("Wrong answer shake animation!");
     }
 
     public void OnNextButtonClicked()

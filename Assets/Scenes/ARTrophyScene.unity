@@ -276,8 +276,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 150, y: -100}
-  m_SizeDelta: {x: 250, y: 130}
+  m_AnchoredPosition: {x: 150, y: -110}
+  m_SizeDelta: {x: 260, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &865591525
 MonoBehaviour:
@@ -501,6 +501,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trophyPrefab: {fileID: 3873847163066426910, guid: 87541eaa50f922541b2492ee6c15c1ab, type: 3}
   instructionText: {fileID: 1428549790}
+  scaleAnimationDuration: 1.2
+  rotationAnimationDuration: 1.5
+  scaleEase: 24
 --- !u!1 &1295323944
 GameObject:
   m_ObjectHideFlags: 0
@@ -814,8 +817,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.InputSystem.EnhancedTouch;
+using DG.Tweening;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ARObjController : MonoBehaviour
@@ -19,7 +20,12 @@ public class ARObjController : MonoBehaviour
     [Header("Reset Settings")]
     public Vector3 defaultScale = new Vector3(1, 1, 1);
 
+    [Header("Animation Settings")]
+    public float animationDuration = 3.0f;
+    public Ease animationEase = Ease.OutBack;
+
     private bool hasInitialRotation = false;
+    private bool hasAnimated = false;
 
     private SimpleFunFact funFactManager;
     private bool hasShownFact = false;
@@ -35,11 +41,12 @@ public class ARObjController : MonoBehaviour
         EnhancedTouchSupport.Disable();
         hasInitialRotation = false;
         hasShownFact = false;
+        hasAnimated = false;
 
         CardDetailController cardController = FindObjectOfType<CardDetailController>();
         if (cardController != null)
         {
-            cardController.HideCardButton();
+            cardController.HideCardButton(instant:true);
         }
     }
 
@@ -67,6 +74,12 @@ public class ARObjController : MonoBehaviour
         if (trackedImage.trackingState != UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
             return;
 
+        if (!hasAnimated && gameObject.activeSelf)
+        {
+            AnimateScaleUp();
+            hasAnimated = true;
+        }
+
         if (!hasInitialRotation)
         {
             SetInitialOrientation();
@@ -79,6 +92,21 @@ public class ARObjController : MonoBehaviour
         {
             ShowFunFactForTargetCountry();
         }
+    }
+
+    void AnimateScaleUp()
+    {
+        Vector3 targetScale = transform.localScale;
+
+        transform.localScale = Vector3.zero;
+
+        transform.DOScale(targetScale, animationDuration)
+            .SetEase(animationEase)
+            .OnComplete(() =>
+            {
+                Debug.Log("Scale animation completed for " + gameObject.name);
+            });
+
     }
 
     void SetInitialOrientation()
@@ -101,6 +129,7 @@ public class ARObjController : MonoBehaviour
         transform.localScale = defaultScale;
         hasInitialRotation = false;
         hasShownFact = false;
+        hasAnimated = false;
 
         CardDetailController cardController = FindObjectOfType<CardDetailController>();
         if (cardController != null)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using DG.Tweening;
 
 public class TrophyManager : MonoBehaviour
 {
@@ -9,6 +10,11 @@ public class TrophyManager : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI instructionText;
+
+    [Header("Animation Settings")]
+    public float spawnDelay = 0.7f;
+    public float scaleAnimationDuration = 3.0f;
+    public Ease scaleEase = Ease.OutElastic;
 
     private GameObject spawnedTrophy;
     private bool trophySpawned = false;
@@ -20,7 +26,9 @@ public class TrophyManager : MonoBehaviour
             instructionText.text = "Trophy will appear in front of you!";
         }
 
-        SpawnTrophyInFrontOfCamera();
+        DOVirtual.DelayedCall(spawnDelay, () => {
+            SpawnTrophyInFrontOfCamera();
+        });
     }
 
     void SpawnTrophyInFrontOfCamera()
@@ -38,16 +46,38 @@ public class TrophyManager : MonoBehaviour
                 spawnedTrophy.transform.localPosition = new Vector3(0, -1, 2.0f);
                 spawnedTrophy.transform.localRotation = Quaternion.Euler(0, 180f, 0);
 
+                AnimateTrophyAppearance();
+
                 trophySpawned = true;
 
                 if (instructionText != null)
                 {
-                    instructionText.text = "Congratulations, Master Explorer!";
+                    DOVirtual.DelayedCall(scaleAnimationDuration, () =>
+                    {
+                        if (instructionText != null)
+                        {
+                            instructionText.text = "Congratulations, Master Explorer!";
+                        }
+                    });
                 }
 
                 Debug.Log("Trophy attached to camera!");
             }
         }
+    }
+
+    void AnimateTrophyAppearance()
+    {
+        Vector3 targetScale = spawnedTrophy.transform.localScale;
+
+        spawnedTrophy.transform.localScale = Vector3.zero;
+
+        spawnedTrophy.transform.DOScale(targetScale, scaleAnimationDuration)
+             .SetEase(scaleEase)
+             .OnComplete(() =>
+             {
+                 Debug.Log("Trophy scale animation completed!");
+             });
     }
 
     void Update()
@@ -62,16 +92,20 @@ public class TrophyManager : MonoBehaviour
     {
         if (spawnedTrophy != null)
         {
-            Destroy(spawnedTrophy);
-            spawnedTrophy = null;
-            trophySpawned = false;
+            spawnedTrophy.transform.DOScale(Vector3.zero, 0.3f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() => {
+                    Destroy(spawnedTrophy);
+                    spawnedTrophy = null;
+                    trophySpawned = false;
 
-            if (instructionText != null)
-            {
-                instructionText.text = "Trophy will appear in front of you!";
-            }
+                    if (instructionText != null)
+                    {
+                        instructionText.text = "Trophy will appear in front of you!";
+                    }
 
-            SpawnTrophyInFrontOfCamera();
+                    SpawnTrophyInFrontOfCamera();
+                });
         }
     }
 
