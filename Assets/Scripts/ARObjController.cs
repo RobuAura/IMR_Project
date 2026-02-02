@@ -21,14 +21,21 @@ public class ARObjController : MonoBehaviour
     public Vector3 defaultScale = new Vector3(1, 1, 1);
 
     [Header("Animation Settings")]
-    public float animationDuration = 3.0f;
-    public Ease animationEase = Ease.OutBack;
+    public float spawnDelay = 0.5f;
+    public float animationDuration = 3.5f;
+    public Ease animationEase = Ease.OutElastic;
 
     private bool hasInitialRotation = false;
     private bool hasAnimated = false;
 
     private SimpleFunFact funFactManager;
     private bool hasShownFact = false;
+
+    void Awake()
+    {
+        defaultScale = transform.localScale;
+        Debug.Log($"Awake() {gameObject.name}: Saved defaultScale = {defaultScale}");
+    }
 
     void OnEnable()
     {
@@ -43,24 +50,32 @@ public class ARObjController : MonoBehaviour
         hasShownFact = false;
         hasAnimated = false;
 
+        transform.DOKill();
+
         CardDetailController cardController = FindObjectOfType<CardDetailController>();
-        if (cardController != null)
+        if (cardController != null && trackedImage != null)
         {
-            cardController.HideCardButton(instant:true);
+            string myCountry = trackedImage.referenceImage.name;
+            string currentCountry = cardController.GetCurrentCountry();
+
+            if (currentCountry == myCountry)
+            {
+                cardController.HideCardButton(instant: true);
+                Debug.Log("Hiding card for: " + myCountry);
+            }
         }
     }
 
     void Start()
     {
         trackedImage = GetComponentInParent<ARTrackedImage>();
-        initialScale = transform.localScale.x;
-
-        if (defaultScale == Vector3.one)
-        {
-            defaultScale = transform.localScale;
-        }
+        initialScale = defaultScale.x; 
 
         funFactManager = FindObjectOfType<SimpleFunFact>();
+
+        transform.localScale = Vector3.zero;
+
+        Debug.Log($"Start() {gameObject.name}: Will animate to defaultScale = {defaultScale}");
     }
 
     void Update()
@@ -72,11 +87,22 @@ public class ARObjController : MonoBehaviour
         }
 
         if (trackedImage.trackingState != UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
+        {
+            if (hasAnimated)
+            {
+                ResetToInitialState();
+            }
             return;
+        }
 
         if (!hasAnimated && gameObject.activeSelf)
         {
-            AnimateScaleUp();
+            DOVirtual.DelayedCall(spawnDelay, () => {
+                if (gameObject.activeSelf)
+                {
+                    AnimateScaleUp();
+                }
+            });
             hasAnimated = true;
         }
 
@@ -96,17 +122,12 @@ public class ARObjController : MonoBehaviour
 
     void AnimateScaleUp()
     {
-        Vector3 targetScale = transform.localScale;
-
-        transform.localScale = Vector3.zero;
-
-        transform.DOScale(targetScale, animationDuration)
-            .SetEase(animationEase)
-            .OnComplete(() =>
-            {
-                Debug.Log("Scale animation completed for " + gameObject.name);
-            });
-
+        transform.DOScale(defaultScale, animationDuration)
+             .SetEase(animationEase)
+             .OnComplete(() =>
+             {
+                 Debug.Log($"Animation completed for {gameObject.name} at scale {transform.localScale}");
+             });
     }
 
     void SetInitialOrientation()
@@ -126,16 +147,12 @@ public class ARObjController : MonoBehaviour
 
     void ResetToInitialState()
     {
-        transform.localScale = defaultScale;
+        transform.localScale = Vector3.zero;
         hasInitialRotation = false;
         hasShownFact = false;
         hasAnimated = false;
 
-        CardDetailController cardController = FindObjectOfType<CardDetailController>();
-        if (cardController != null)
-        {
-            cardController.HideCardButton();
-        }
+        Debug.Log("Reset to initial state for: " + gameObject.name);
     }
 
     void HandleTouchInput()

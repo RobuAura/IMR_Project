@@ -24,6 +24,9 @@ public class CardDetailController : MonoBehaviour
     public TextMeshProUGUI descriptionText;
     public CountryCardData[] countries;
 
+    [Header("Instructions Button")]
+    public GameObject instructionsButton;
+
     [Header("Hotspot Animation Settings")]
     public Color discoveredColor = new Color(0.4f, 1f, 0.8f, 0.3f);
     public float animationDuration = 0.5f;
@@ -102,6 +105,11 @@ public class CardDetailController : MonoBehaviour
             cardDetailPanel.SetActive(true);
             LoadCountryData(currentCountry);
         }
+
+        if (instructionsButton != null)
+        {
+            instructionsButton.SetActive(false);
+        }
     }
 
     void LoadCountryData(string countryName)
@@ -179,6 +187,16 @@ public class CardDetailController : MonoBehaviour
             cardDetailPanel.SetActive(false);
         }
         StopAllHotspotPulses();
+
+        if (instructionsButton  != null)
+        {
+            instructionsButton.SetActive(true);
+        }
+    }
+
+    public string GetCurrentCountry()
+    {
+        return currentCountry;
     }
 
     void StopAllHotspotPulses()
