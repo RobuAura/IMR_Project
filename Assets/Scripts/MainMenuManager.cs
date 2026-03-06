@@ -8,6 +8,7 @@ public class MainMenuManager : MonoBehaviour
     [Header("Menu Buttons")]
     public Button scanFlagButton;
     public Button quizButton;
+    public Button gameButton;
 
     [Header("Animation Settings")]
     public float clickScale = 1.08f;
@@ -42,6 +43,22 @@ public class MainMenuManager : MonoBehaviour
 
         DOVirtual.DelayedCall(totalDelay, () => {
             SceneManager.LoadScene("QuizScene");
+        });
+    }
+
+    public void OnGameButtonClicked()
+    {
+        Debug.Log("Game button clicked!");
+
+        if (gameButton != null)
+        {
+            AnimateButton(gameButton);
+        }
+
+        float totalDelay = (clickDuration * 2) + 0.03f;
+        
+        DOVirtual.DelayedCall(totalDelay, () => {
+            SceneManager.LoadScene("GameSetupScene");
         });
     }
 

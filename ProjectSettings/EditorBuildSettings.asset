@@ -23,6 +23,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ARTrophyScene.unity
     guid: 79658555db0984c468a642f71b036b79
+  - enabled: 1
+    path: Assets/Scenes/GameSetupScene.unity
+    guid: 839f3467964c80a47ae8b34a604a86f7
+  - enabled: 1
+    path: Assets/Scenes/MemoryGameScene.unity
+    guid: ede07a93c83876948bd396de74c37c39
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 1de9ebe0915121e4a9a1957cfa682e20, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
