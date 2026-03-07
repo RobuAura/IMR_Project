@@ -1,15 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class Card : MonoBehaviour
 {
     [Header("References")]
     public GameObject frontFace;
+    public TextMeshProUGUI cardNumberText;
 
+    public int CardId { get; private set; } = -1;
     public bool IsFlipped { get; private set; } = false;
     public bool IsMatched { get; private set; } = false;
     private bool isFlipping = false;
+
+    public void SetCard(int id)
+    {
+        CardId = id;
+        cardNumberText.text = id.ToString();
+    }
 
     public void OnCardClicked()
     {
@@ -51,5 +60,14 @@ public class Card : MonoBehaviour
     public void SetMatched()
     {
         IsMatched = true;
+
+        Sequence matchSeq = DOTween.Sequence();
+        matchSeq.Append(transform.DOScale(Vector3.one * 1.15f, 0.15f).SetEase(Ease.OutQuad));
+        matchSeq.Append(transform.DOScale(Vector3.zero, 0.2f).SetEase(Ease.InQuad));
+        matchSeq.OnComplete(() =>
+        {
+            GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            frontFace.SetActive(false);
+        });
     }
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
+using System.Collections.Generic;
+using TMPro;
 
 public class MemoryGameManager : MonoBehaviour
 {
@@ -19,6 +21,18 @@ public class MemoryGameManager : MonoBehaviour
 
     [Header("Settings")]
     public float flipBackDelay = 1.5f; // secunde pana se intorc inapoi
+
+    [Header("Timer")]
+    public TextMeshProUGUI timerText;
+
+    [Header("Game Over")]
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI timeResultText;
+    public Button playAgainButton;
+    public Button menuButton;
+
+    private float timeElapsed = 0f;
+    private bool timerRunning = false;
 
     private int rows;
     private int cols;
@@ -48,6 +62,20 @@ public class MemoryGameManager : MonoBehaviour
 
         SetupGrid();
         GenerateCards();
+
+        timerRunning = true;
+    }
+
+    void Update()
+    {
+        if (!timerRunning) return;
+
+        timeElapsed += Time.deltaTime;
+
+        int minutes = Mathf.FloorToInt(timeElapsed / 60f);
+        int seconds = Mathf.FloorToInt(timeElapsed % 60f);
+
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     void SetupGrid()
@@ -74,12 +102,33 @@ public class MemoryGameManager : MonoBehaviour
     void GenerateCards()
     {
         int totalCards = rows * cols;
+        int totalPairs = totalCards / 2;
+
+        List<int> cardIds = new List<int>();
+        for (int i = 1; i <= totalPairs; i++)
+        {
+            cardIds.Add(i);
+            cardIds.Add(i);
+        }
+
+        for (int i = cardIds.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            int temp = cardIds[i];
+            cardIds[i] = cardIds[randomIndex];
+            cardIds[randomIndex] = temp;
+        }
 
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, gridLayoutGroup.transform);
             cardObj.name = "Card_" + i;
+
+            Card card = cardObj.GetComponent<Card>();
+            card.SetCard(cardIds[i]);
         }
+
+        Debug.Log($"Generated {totalCards} cards ({rows}x{cols}) with {totalPairs} pairs");
     }
 
     // Apelat din Card.cs cand se apasa o carte
@@ -105,17 +154,53 @@ public class MemoryGameManager : MonoBehaviour
 
     void CheckMatch()
     {
-        // Pentru moment toate cartile sunt "diferite" — le intoarcem inapoi dupa delay
-        // Cand adaugam ID-uri vom verifica perechea reala
-        DOVirtual.DelayedCall(flipBackDelay, () =>
+        if (firstCard.CardId == secondCard.CardId)
         {
-            firstCard.FlipToBack();
-            secondCard.FlipToBack();
+            DOVirtual.DelayedCall(0.5f, () =>
+            {
+                firstCard.SetMatched();
+                secondCard.SetMatched();
 
-            firstCard = null;
-            secondCard = null;
-            canSelect = true;
-        });
+                firstCard = null;
+                secondCard = null;
+                canSelect = true;
+                if (AreAllMatched())
+                {
+                    timerRunning = false;
+                    ShowGameOver();
+                }
+            });
+        }
+        else
+        {
+            // Nu e pereche - intoarce inapoi dupa delay
+            DOVirtual.DelayedCall(flipBackDelay, () =>
+            {
+                firstCard.FlipToBack();
+                secondCard.FlipToBack();
+
+                firstCard = null;
+                secondCard = null;
+                canSelect = true;
+                if (AreAllMatched())
+                {
+                    timerRunning = false;
+                    ShowGameOver();
+                }
+
+            });
+        }
+    }
+
+    bool AreAllMatched()
+    {
+        foreach (Transform child in gridLayoutGroup.transform)
+        {
+            Card card = child.GetComponent<Card>();
+            if (card != null && !card.IsMatched)
+                return false;
+        }
+        return true;
     }
 
     public void OnBackButtonClicked()
@@ -148,6 +233,30 @@ public class MemoryGameManager : MonoBehaviour
         quitConfirmPanel.transform.DOScale(Vector3.one * 0.8f, 0.15f)
             .SetEase(Ease.InBack)
             .OnComplete(() => quitConfirmPanel.SetActive(false));
+    }
+
+    void ShowGameOver()
+    {
+        int minutes = Mathf.FloorToInt(timeElapsed / 60f);
+        int seconds = Mathf.FloorToInt(timeElapsed % 60f);
+        timeResultText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
+
+        DOVirtual.DelayedCall(1.5f, () =>
+        {
+            gameOverPanel.SetActive(true);
+            gameOverPanel.transform.localScale = Vector3.one * 0.8f;
+            gameOverPanel.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBack);
+        });
+    }
+
+    public void OnPlayAgainButtonClicked()
+    {
+        SceneManager.LoadScene("MemoryGameScene");
+    }
+
+    public void OnMenuButtonClicked()
+    {
+        SceneManager.LoadScene("GameSetupScene");
     }
 
     void AnimateButton(Button button)
