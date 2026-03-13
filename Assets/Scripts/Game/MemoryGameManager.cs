@@ -25,8 +25,13 @@ public class MemoryGameManager : MonoBehaviour
     [Header("Timer")]
     public TextMeshProUGUI timerText;
 
+    [Header("Turn System")]
+    public TextMeshProUGUI turnText;
+    public AIPlayer aiPlayer;
+
     [Header("Game Over")]
     public GameObject gameOverPanel;
+    public TextMeshProUGUI winText;
     public TextMeshProUGUI timeResultText;
     public Button playAgainButton;
     public Button menuButton;
@@ -42,6 +47,11 @@ public class MemoryGameManager : MonoBehaviour
     private Card firstCard = null;
     private Card secondCard = null;
     private bool canSelect = true; // blocheaza selectia cat timp se verifica perechea
+
+    private int playerScore = 0;
+    private int aiScore = 0;
+
+    private bool isPlayerTurn = true;
 
     void Awake()
     {
@@ -60,10 +70,23 @@ public class MemoryGameManager : MonoBehaviour
             case 2: rows = 5; cols = 6; break;
         }
 
+        quitConfirmPanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+
+        // Seteaza memoria AI in functie de dificultate
+        if (aiPlayer != null)
+            aiPlayer.memorySize = (difficulty == 2) ? 5 : 3;
+
         SetupGrid();
         GenerateCards();
 
         timerRunning = true;
+
+        isPlayerTurn = Random.Range(0, 2) == 0;
+        UpdateTurnText();
+
+        if (!isPlayerTurn && vsComputer)
+            aiPlayer.StartTurn();
     }
 
     void Update()
@@ -76,6 +99,19 @@ public class MemoryGameManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(timeElapsed % 60f);
 
         timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    void UpdateTurnText()
+    {
+        if (turnText == null) return;
+
+        if (!vsComputer)
+        {
+            turnText.gameObject.SetActive(false);
+            return;
+        }
+
+        turnText.text = isPlayerTurn ? "Your Turn" : "AI Turn";
     }
 
     void SetupGrid()
@@ -131,49 +167,77 @@ public class MemoryGameManager : MonoBehaviour
         Debug.Log($"Generated {totalCards} cards ({rows}x{cols}) with {totalPairs} pairs");
     }
 
-    // Apelat din Card.cs cand se apasa o carte
     public void OnCardSelected(Card card)
     {
         if (!canSelect) return;
+        if (vsComputer && !isPlayerTurn) return; // blocheaza jucatorul in tura AI
 
         card.FlipToFront();
 
         if (firstCard == null)
         {
-            // Prima carte selectata
             firstCard = card;
         }
         else
         {
-            // A doua carte selectata
             secondCard = card;
-            canSelect = false; // blocheaza selectia
-            CheckMatch();
+            canSelect = false;
+            CheckMatch(isPlayer: true);
         }
     }
 
-    void CheckMatch()
+    public void AIFlipCard(Card card)
+    {
+        card.FlipToFront();
+
+        if (firstCard == null)
+        {
+            firstCard = card;
+        }
+        else
+        {
+            secondCard = card;
+            canSelect = false;
+            CheckMatch(isPlayer: false);
+        }
+    }
+
+    void CheckMatch(bool isPlayer)
     {
         if (firstCard.CardId == secondCard.CardId)
         {
+            // Pereche gasita!
+            if (isPlayer) playerScore++;
+            else aiScore++;
+
             DOVirtual.DelayedCall(0.5f, () =>
             {
                 firstCard.SetMatched();
                 secondCard.SetMatched();
 
+                if (aiPlayer != null)
+                    aiPlayer.CleanMemory();
+
                 firstCard = null;
                 secondCard = null;
                 canSelect = true;
+
                 if (AreAllMatched())
                 {
                     timerRunning = false;
                     ShowGameOver();
                 }
+                else
+                {
+                    // Pereche gasita = inca o tura pentru acelasi jucator
+                    UpdateTurnText();
+                    if (vsComputer && !isPlayerTurn)
+                        aiPlayer.StartTurn();
+                }
             });
         }
         else
         {
-            // Nu e pereche - intoarce inapoi dupa delay
             DOVirtual.DelayedCall(flipBackDelay, () =>
             {
                 firstCard.FlipToBack();
@@ -182,12 +246,16 @@ public class MemoryGameManager : MonoBehaviour
                 firstCard = null;
                 secondCard = null;
                 canSelect = true;
-                if (AreAllMatched())
-                {
-                    timerRunning = false;
-                    ShowGameOver();
-                }
 
+                // Schimba tura
+                if (vsComputer)
+                {
+                    isPlayerTurn = !isPlayerTurn;
+                    UpdateTurnText();
+
+                    if (!isPlayerTurn)
+                        aiPlayer.StartTurn();
+                }
             });
         }
     }
@@ -239,7 +307,22 @@ public class MemoryGameManager : MonoBehaviour
     {
         int minutes = Mathf.FloorToInt(timeElapsed / 60f);
         int seconds = Mathf.FloorToInt(timeElapsed % 60f);
-        timeResultText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
+
+        if (vsComputer)
+        {
+            if (playerScore > aiScore)
+                winText.text = "You Win!";
+            else if (playerScore < aiScore)
+                winText.text = "AI Wins!";
+            else
+                winText.text = "It's a Tie!";
+
+            timeResultText.text = "You: " + playerScore + "  AI: " + aiScore;
+        }
+        else
+        {
+            timeResultText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
+        }
 
         DOVirtual.DelayedCall(1.5f, () =>
         {
