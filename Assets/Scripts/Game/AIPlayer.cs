@@ -6,10 +6,13 @@ public class AIPlayer : MonoBehaviour
 {
     [Header("Settings")]
     public float thinkDelay = 0.8f;
-    public int memorySize = 3; // Medium = 3, Hard = 5
+    public int memorySize = 3; // Medium = 3, Hard = 4
 
     private List<Card> memory = new List<Card>();
     private MemoryGameManager gameManager;
+
+    private Card lastCardA = null;
+    private Card lastCardB = null;
 
     void Start()
     {
@@ -27,16 +30,13 @@ public class AIPlayer : MonoBehaviour
 
         CleanMemory();
 
-        Debug.Log("AI: incepe tura");
-
         // Pasul 1: verifica daca are o pereche in memorie
         Card firstOfPair = FindPairInMemory(null);
-        Debug.Log("AI: pereche in memorie = " + (firstOfPair != null));
-
+        
         if (firstOfPair != null)
         {
             Card secondOfPair = FindPartner(firstOfPair);
-            Debug.Log("AI: partner gasit = " + (secondOfPair != null));
+            
             if (secondOfPair == null) yield break;
 
             if (!firstOfPair.IsMatched && !firstOfPair.IsFlipped)
@@ -51,10 +51,9 @@ public class AIPlayer : MonoBehaviour
         else
         {
             Card cardA = GetRandomUnflippedCard();
-            Debug.Log("AI: cardA = " + (cardA != null ? cardA.name : "NULL"));
+            
             if (cardA == null)
             {
-                Debug.Log("AI: nu mai sunt carti disponibile!");
                 yield break;
             }
 
@@ -74,13 +73,15 @@ public class AIPlayer : MonoBehaviour
                 if (cardB == null) yield break;
 
                 gameManager.AIFlipCard(cardB);
+                lastCardA = cardA;
+                lastCardB = cardB;
                 yield return new WaitForSeconds(0.1f);
                 UpdateMemory(cardA, cardB);
             }
         }
     }
 
-    void UpdateMemory(Card cardA, Card cardB)
+    public void UpdateMemory(Card cardA, Card cardB)
     {
         int freeSlots = memorySize - memory.Count;
 
@@ -206,8 +207,30 @@ public class AIPlayer : MonoBehaviour
         return null;
     }
 
-    // Returneaza o carte aleatoare neîntoarsa si nematched, excluzand exclude
     Card GetRandomUnflippedCard(Card exclude = null)
+    {
+        List<Card> available = new List<Card>();
+
+        foreach (Transform child in gameManager.gridLayoutGroup.transform)
+        {
+            Card c = child.GetComponent<Card>();
+            if (c != null && !c.IsFlipped && !c.IsMatched
+                && c != exclude
+                && c != lastCardA
+                && c != lastCardB)
+                available.Add(c);
+        }
+
+        // Daca nu mai sunt carti disponibile dupa excludere, ignora excluderea
+        if (available.Count == 0)
+        {
+            return GetRandomUnflippedCardNoExclusion(exclude);
+        }
+
+        return available[Random.Range(0, available.Count)];
+    }
+
+    Card GetRandomUnflippedCardNoExclusion(Card exclude = null)
     {
         List<Card> available = new List<Card>();
 

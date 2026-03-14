@@ -36,6 +36,17 @@ public class MemoryGameManager : MonoBehaviour
     public Button playAgainButton;
     public Button menuButton;
 
+    [Header("Hint")]
+    public Button hintButton;
+    public TextMeshProUGUI hintButtonText;
+    public Color hintColor = Color.yellow;
+    public GameObject hintNotificationPanel;
+    public TextMeshProUGUI hintNotificationText;
+    private int consecutivePairs = 0;
+
+    private int hintsRemaining = 3;
+    private List<Card> hintedCards = new List<Card>();
+
     private float timeElapsed = 0f;
     private bool timerRunning = false;
 
@@ -52,6 +63,8 @@ public class MemoryGameManager : MonoBehaviour
     private int aiScore = 0;
 
     private bool isPlayerTurn = true;
+
+    private bool usedHintThisTurn = false;
 
     void Awake()
     {
@@ -73,9 +86,18 @@ public class MemoryGameManager : MonoBehaviour
         quitConfirmPanel.SetActive(false);
         gameOverPanel.SetActive(false);
 
+        // Ascunde butonul de hint daca e vs computer
+        if (vsComputer && hintButton != null)
+            hintButton.gameObject.SetActive(false);
+
+        hintsRemaining = PlayerPrefs.GetInt("HintsRemaining", 3);
+        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+        if (hintsRemaining <= 0)
+            hintButton.interactable = false;
+
         // Seteaza memoria AI in functie de dificultate
         if (aiPlayer != null)
-            aiPlayer.memorySize = (difficulty == 2) ? 5 : 3;
+            aiPlayer.memorySize = (difficulty == 2) ? 4 : 3;
 
         SetupGrid();
         GenerateCards();
@@ -172,6 +194,15 @@ public class MemoryGameManager : MonoBehaviour
         if (!canSelect) return;
         if (vsComputer && !isPlayerTurn) return; // blocheaza jucatorul in tura AI
 
+        if (!hintedCards.Contains(card))
+            ResetHints();
+        else
+        {
+            card.SetHighlight(false, hintColor); // reseteaza culoarea cartii apasate
+            hintedCards.Remove(card);
+            usedHintThisTurn = true;
+        }
+
         card.FlipToFront();
 
         if (firstCard == null)
@@ -222,6 +253,29 @@ public class MemoryGameManager : MonoBehaviour
                 secondCard = null;
                 canSelect = true;
 
+                if (!vsComputer && isPlayer)
+                {
+                    if (!usedHintThisTurn)
+                        consecutivePairs++;
+                    else
+                        consecutivePairs = 0;
+
+                    usedHintThisTurn = false;
+
+                    int required = (difficulty == 0) ? int.MaxValue : 3;
+
+                    if (consecutivePairs >= required)
+                    {
+                        consecutivePairs = 0;
+                        hintsRemaining++;
+                        PlayerPrefs.SetInt("HintsRemaining", hintsRemaining);
+                        PlayerPrefs.Save();
+                        hintButton.interactable = true;
+                        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+                        ShowHintNotification();
+                    }
+                }
+
                 if (AreAllMatched())
                 {
                     timerRunning = false;
@@ -238,6 +292,16 @@ public class MemoryGameManager : MonoBehaviour
         }
         else
         {
+            // La Hard, AI memoreaza si cartile jucatorului
+            if (vsComputer && isPlayer && difficulty == 2)
+                aiPlayer.UpdateMemory(firstCard, secondCard);
+
+            if (!vsComputer)
+            {
+                consecutivePairs = 0;
+                usedHintThisTurn = false;
+            }
+
             DOVirtual.DelayedCall(flipBackDelay, () =>
             {
                 firstCard.FlipToBack();
@@ -247,7 +311,6 @@ public class MemoryGameManager : MonoBehaviour
                 secondCard = null;
                 canSelect = true;
 
-                // Schimba tura
                 if (vsComputer)
                 {
                     isPlayerTurn = !isPlayerTurn;
@@ -350,5 +413,106 @@ public class MemoryGameManager : MonoBehaviour
         Sequence seq = DOTween.Sequence();
         seq.Append(button.transform.DOScale(originalScale * 1.08f, 0.12f).SetEase(Ease.OutQuad));
         seq.Append(button.transform.DOScale(originalScale, 0.12f).SetEase(Ease.InQuad));
+    }
+
+    public void OnHintButtonClicked()
+    {
+        if (hintsRemaining <= 0) return;
+        if (vsComputer) return;
+
+        // Reseteaza hint-urile anterioare
+        ResetHints();
+
+        if (firstCard == null)
+        {
+            // Nicio carte intoarsa — arata o pereche random
+            List<Card> unflipped = GetAllUnflippedCards();
+            if (unflipped.Count < 2) return;
+
+            // Alege random o carte si gaseste perechea ei
+            Card cardA = unflipped[Random.Range(0, unflipped.Count)];
+            Card cardB = null;
+
+            foreach (Card c in unflipped)
+            {
+                if (c != cardA && c.CardId == cardA.CardId)
+                {
+                    cardB = c;
+                    break;
+                }
+            }
+
+            if (cardB == null) return;
+
+            HighlightCard(cardA);
+            HighlightCard(cardB);
+        }
+        else
+        {
+            // O carte intoarsa — arata perechea ei
+            List<Card> unflipped = GetAllUnflippedCards();
+
+            foreach (Card c in unflipped)
+            {
+                if (c.CardId == firstCard.CardId)
+                {
+                    HighlightCard(c);
+                    break;
+                }
+            }
+        }
+
+        hintsRemaining--;
+        PlayerPrefs.SetInt("HintsRemaining", hintsRemaining);
+        PlayerPrefs.Save();
+        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+        if (hintsRemaining <= 0)
+            hintButton.interactable = false;
+    }
+
+    void HighlightCard(Card card)
+    {
+        card.SetHighlight(true, hintColor);
+        hintedCards.Add(card);
+    }
+
+    void ResetHints()
+    {
+        foreach (Card c in hintedCards)
+        {
+            if (c != null && !c.IsFlipped && !c.IsMatched)
+                c.SetHighlight(false, hintColor);
+        }
+        hintedCards.Clear();
+    }
+
+    List<Card> GetAllUnflippedCards()
+    {
+        List<Card> result = new List<Card>();
+        foreach (Transform child in gridLayoutGroup.transform)
+        {
+            Card c = child.GetComponent<Card>();
+            if (c != null && !c.IsFlipped && !c.IsMatched)
+                result.Add(c);
+        }
+        return result;
+    }
+
+    void ShowHintNotification()
+    {
+        hintNotificationText.text = "+1 Hint!";
+        hintNotificationPanel.SetActive(true);
+
+        CanvasGroup cg = hintNotificationPanel.GetComponent<CanvasGroup>();
+        if (cg == null) cg = hintNotificationPanel.AddComponent<CanvasGroup>();
+
+        cg.alpha = 0f;
+        cg.DOFade(1f, 0.2f);
+
+        DOVirtual.DelayedCall(1f, () =>
+        {
+            cg.DOFade(0f, 0.5f).OnComplete(() =>
+                hintNotificationPanel.SetActive(false));
+        });
     }
 }

@@ -14,6 +14,18 @@ public class Card : MonoBehaviour
     public bool IsMatched { get; private set; } = false;
     private bool isFlipping = false;
 
+    private Color originalColor;
+
+    void Awake()
+    {
+        originalColor = GetComponent<Image>().color;
+    }
+
+    public void SetHighlight(bool highlighted, Color highlightColor)
+    {
+        GetComponent<Image>().color = highlighted ? highlightColor : originalColor;
+    }
+
     public void SetCard(int id)
     {
         CardId = id;
