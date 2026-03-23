@@ -143,15 +143,18 @@ public class MemoryGameManager : MonoBehaviour
         float gridWidth = gridRect.rect.width;
         float gridHeight = gridRect.rect.height;
 
-        float spacingX = 10f;
-        float spacingY = 10f;
+        float spacingX = gridLayoutGroup.spacing.x;
+        float spacingY = gridLayoutGroup.spacing.y;
+        float padLeft = gridLayoutGroup.padding.left;
+        float padRight = gridLayoutGroup.padding.right;
+        float padTop = gridLayoutGroup.padding.top;
+        float padBot = gridLayoutGroup.padding.bottom;
 
-        float cellWidth = (gridWidth - spacingX * (cols - 1)) / cols;
-        float cellHeight = (gridHeight - spacingY * (rows - 1)) / rows;
+        float cellWidth = (gridWidth - padLeft - padRight - spacingX * (cols - 1)) / cols;
+        float cellHeight = (gridHeight - padTop - padBot - spacingY * (rows - 1)) / rows;
         float cellSize = Mathf.Min(cellWidth, cellHeight);
 
         gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
-        gridLayoutGroup.spacing = new Vector2(spacingX, spacingY);
         gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayoutGroup.constraintCount = cols;
         gridLayoutGroup.childAlignment = TextAnchor.MiddleCenter;
