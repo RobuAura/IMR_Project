@@ -50,6 +50,10 @@ public class MemoryGameManager : MonoBehaviour
     public TextMeshProUGUI playerScoreText;
     public TextMeshProUGUI aiScoreText;
 
+    [Header("Challenge Notification")]
+    public GameObject challengeNotificationPanel;
+    public TextMeshProUGUI challengeNotificationText;
+
     private int hintsRemaining = 3;
     private List<Card> hintedCards = new List<Card>();
 
@@ -302,6 +306,24 @@ public class MemoryGameManager : MonoBehaviour
                     }
                 }
 
+                if (vsComputer && !isPlayer)
+                {
+                    consecutiveMatchesThisTurn++;
+                    if (consecutiveMatchesThisTurn >= 2)
+                    {
+                        consecutiveMatchesThisTurn = 0;
+                        isPlayerTurn = true;
+                        if (AreAllMatched())
+                        {
+                            timerRunning = false;
+                            ShowGameOver();
+                            return;
+                        }
+                        UpdateTurnText();
+                        return;
+                    }
+                }
+
                 if (!vsComputer && isPlayer)
                 {
                     if (!usedHintThisTurn)
@@ -445,7 +467,62 @@ public class MemoryGameManager : MonoBehaviour
             timeResultText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
         }
 
-        DOVirtual.DelayedCall(1.5f, () =>
+        bool wonVsAI = vsComputer && playerScore > aiScore;
+        PlayerPrefs.SetInt("LastGame_Difficulty", difficulty);
+        PlayerPrefs.SetInt("LastGame_WonVsAI", wonVsAI ? 1 : 0);
+
+        if (difficulty == 0)
+            PlayerPrefs.SetInt("DailyChallenge_Progress1",
+                Mathf.Min(PlayerPrefs.GetInt("DailyChallenge_Progress1", 0) + 1, 5));
+        if (difficulty == 1 && wonVsAI)
+            PlayerPrefs.SetInt("DailyChallenge_Progress2",
+                Mathf.Min(PlayerPrefs.GetInt("DailyChallenge_Progress2", 0) + 1, 3));
+        if (difficulty == 2 && wonVsAI)
+            PlayerPrefs.SetInt("DailyChallenge_Progress3",
+                Mathf.Min(PlayerPrefs.GetInt("DailyChallenge_Progress3", 0) + 1, 1));
+
+
+        PlayerPrefs.SetInt("LastGame_Completed", 0);
+        PlayerPrefs.Save();
+
+        // Verifica daca vreun challenge a fost completat
+        List<string> completedChallenges = new List<string>();
+
+        int p1 = PlayerPrefs.GetInt("DailyChallenge_Progress1", 0);
+        int p2 = PlayerPrefs.GetInt("DailyChallenge_Progress2", 0);
+        int p3 = PlayerPrefs.GetInt("DailyChallenge_Progress3", 0);
+
+        if (p1 >= 5 && PlayerPrefs.GetInt("DailyChallenge_Notified1", 0) == 0)
+        {
+            completedChallenges.Add("Challenge 1 completed!");
+            PlayerPrefs.SetInt("DailyChallenge_Notified1", 1);
+        }
+        if (p2 >= 3 && PlayerPrefs.GetInt("DailyChallenge_Notified2", 0) == 0)
+        {
+            completedChallenges.Add("Challenge 2 completed!");
+            PlayerPrefs.SetInt("DailyChallenge_Notified2", 1);
+        }
+        if (p3 >= 1 && PlayerPrefs.GetInt("DailyChallenge_Notified3", 0) == 0)
+        {
+            completedChallenges.Add("Challenge 3 completed!");
+            PlayerPrefs.SetInt("DailyChallenge_Notified3", 1);
+        }
+        if (p1 >= 5 && p2 >= 3 && p3 >= 1 && PlayerPrefs.GetInt("DailyChallenge_NotifiedAll", 0) == 0)
+        {
+            completedChallenges.Add("All challenges completed! +2 Hints!");
+            PlayerPrefs.SetInt("DailyChallenge_NotifiedAll", 1);
+        }
+        PlayerPrefs.Save();
+
+        float delay = 1.5f;
+        foreach (string msg in completedChallenges)
+        {
+            string localMsg = msg;
+            DOVirtual.DelayedCall(delay, () => ShowChallengeNotification(localMsg));
+            delay += 2f;
+        }
+
+        DOVirtual.DelayedCall(delay, () =>
         {
             gameOverPanel.SetActive(true);
             gameOverPanel.transform.localScale = Vector3.one * 0.8f;
@@ -455,6 +532,12 @@ public class MemoryGameManager : MonoBehaviour
 
     public void OnPlayAgainButtonClicked()
     {
+        bool wonVsAI = vsComputer && playerScore > aiScore;
+        PlayerPrefs.SetInt("LastGame_Difficulty", difficulty);
+        PlayerPrefs.SetInt("LastGame_WonVsAI", wonVsAI ? 1 : 0);
+        PlayerPrefs.SetInt("LastGame_Completed", 1);
+        PlayerPrefs.Save();
+
         SceneManager.LoadScene("MemoryGameScene");
     }
 
@@ -571,6 +654,24 @@ public class MemoryGameManager : MonoBehaviour
         {
             cg.DOFade(0f, 0.5f).OnComplete(() =>
                 hintNotificationPanel.SetActive(false));
+        });
+    }
+
+    void ShowChallengeNotification(string message)
+    {
+        challengeNotificationText.text = message;
+        challengeNotificationPanel.SetActive(true);
+
+        CanvasGroup cg = challengeNotificationPanel.GetComponent<CanvasGroup>();
+        if (cg == null) cg = challengeNotificationPanel.AddComponent<CanvasGroup>();
+
+        cg.alpha = 0f;
+        cg.DOFade(1f, 0.2f);
+
+        DOVirtual.DelayedCall(1.5f, () =>
+        {
+            cg.DOFade(0f, 0.3f).OnComplete(() =>
+                challengeNotificationPanel.SetActive(false));
         });
     }
 }
