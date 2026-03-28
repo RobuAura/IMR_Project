@@ -44,6 +44,12 @@ public class MemoryGameManager : MonoBehaviour
     public TextMeshProUGUI hintNotificationText;
     private int consecutivePairs = 0;
 
+    [Header("Score UI")]
+    public GameObject playerScorePanel;
+    public GameObject aiScorePanel;
+    public TextMeshProUGUI playerScoreText;
+    public TextMeshProUGUI aiScoreText;
+
     private int hintsRemaining = 3;
     private List<Card> hintedCards = new List<Card>();
 
@@ -66,6 +72,11 @@ public class MemoryGameManager : MonoBehaviour
 
     private bool usedHintThisTurn = false;
 
+    private int consecutiveMatchesThisTurn = 0;
+
+    public Card playerLastCardA = null;
+    public Card playerLastCardB = null;
+
     void Awake()
     {
         Instance = this;
@@ -80,7 +91,7 @@ public class MemoryGameManager : MonoBehaviour
         {
             case 0: rows = 3; cols = 4; break;
             case 1: rows = 4; cols = 4; break;
-            case 2: rows = 5; cols = 6; break;
+            case 2: rows = 6; cols = 5; break;
         }
 
         quitConfirmPanel.SetActive(false);
@@ -91,9 +102,17 @@ public class MemoryGameManager : MonoBehaviour
             hintButton.gameObject.SetActive(false);
 
         hintsRemaining = PlayerPrefs.GetInt("HintsRemaining", 3);
-        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+        hintButtonText.text = hintsRemaining.ToString();
         if (hintsRemaining <= 0)
             hintButton.interactable = false;
+
+        if (vsComputer)
+        {
+            playerScorePanel.SetActive(true);
+            aiScorePanel.SetActive(true);
+            playerScoreText.text = "0";
+            aiScoreText.text = "0";
+        }
 
         // Seteaza memoria AI in functie de dificultate
         if (aiPlayer != null)
@@ -249,12 +268,39 @@ public class MemoryGameManager : MonoBehaviour
                 firstCard.SetMatched();
                 secondCard.SetMatched();
 
+                if (vsComputer)
+                {
+                    playerScoreText.text = playerScore.ToString();
+                    aiScoreText.text = aiScore.ToString();
+                }
+
                 if (aiPlayer != null)
                     aiPlayer.CleanMemory();
 
                 firstCard = null;
                 secondCard = null;
                 canSelect = true;
+
+                if (vsComputer && isPlayer)
+                {
+                    consecutiveMatchesThisTurn++;
+                    if (consecutiveMatchesThisTurn >= 2)
+                    {
+                        consecutiveMatchesThisTurn = 0;
+                        isPlayerTurn = false;
+
+                        if (AreAllMatched())
+                        {
+                            timerRunning = false;
+                            ShowGameOver();
+                            return;
+                        }
+
+                        UpdateTurnText();
+                        aiPlayer.StartTurn();
+                        return;
+                    }
+                }
 
                 if (!vsComputer && isPlayer)
                 {
@@ -274,7 +320,7 @@ public class MemoryGameManager : MonoBehaviour
                         PlayerPrefs.SetInt("HintsRemaining", hintsRemaining);
                         PlayerPrefs.Save();
                         hintButton.interactable = true;
-                        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+                        hintButtonText.text = hintsRemaining.ToString();
                         ShowHintNotification();
                     }
                 }
@@ -303,6 +349,15 @@ public class MemoryGameManager : MonoBehaviour
             {
                 consecutivePairs = 0;
                 usedHintThisTurn = false;
+            }
+
+            if (vsComputer)
+                consecutiveMatchesThisTurn = 0;
+
+            if (vsComputer && isPlayer)
+            {
+                playerLastCardA = firstCard;
+                playerLastCardB = secondCard;
             }
 
             DOVirtual.DelayedCall(flipBackDelay, () =>
@@ -468,7 +523,7 @@ public class MemoryGameManager : MonoBehaviour
         hintsRemaining--;
         PlayerPrefs.SetInt("HintsRemaining", hintsRemaining);
         PlayerPrefs.Save();
-        hintButtonText.text = "Hint (" + hintsRemaining + ")";
+        hintButtonText.text = hintsRemaining.ToString();
         if (hintsRemaining <= 0)
             hintButton.interactable = false;
     }

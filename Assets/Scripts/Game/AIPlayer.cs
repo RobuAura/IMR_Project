@@ -217,7 +217,9 @@ public class AIPlayer : MonoBehaviour
             if (c != null && !c.IsFlipped && !c.IsMatched
                 && c != exclude
                 && c != lastCardA
-                && c != lastCardB)
+                && c != lastCardB
+                && c != gameManager.playerLastCardA
+                && c != gameManager.playerLastCardB)
                 available.Add(c);
         }
 
