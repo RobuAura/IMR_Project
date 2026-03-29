@@ -95,8 +95,8 @@ public class MemoryGameManager : MonoBehaviour
 
         switch (difficulty)
         {
-            case 0: rows = 3; cols = 4; break;
-            case 1: rows = 4; cols = 4; break;
+            case 0: rows = 4; cols = 4; break;
+            case 1: rows = 5; cols = 4; break;
             case 2: rows = 6; cols = 5; break;
         }
 

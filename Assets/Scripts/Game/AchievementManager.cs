@@ -92,13 +92,10 @@ public class AchievementManager : MonoBehaviour
             TextMeshProUGUI countText = item.transform.Find("ProgressCountText").GetComponent<TextMeshProUGUI>();
             Image progressBar = item.transform.Find("ProgressBar").GetComponent<Image>();
 
-            int prevThreshold = GetPrevThreshold(key, nextThreshold);
-            int progressInRange = current - prevThreshold;
-            int rangeSize = nextThreshold - prevThreshold;
-
             nameText.text = name;
             countText.text = current + "/" + nextThreshold;
-            progressBar.fillAmount = (float)progressInRange / rangeSize;
+
+            progressBar.fillAmount = (float)current / nextThreshold;
         }
 
         // Sectiunea "Completed:"
