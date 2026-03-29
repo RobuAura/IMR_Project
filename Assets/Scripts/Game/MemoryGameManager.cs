@@ -81,6 +81,8 @@ public class MemoryGameManager : MonoBehaviour
     public Card playerLastCardA = null;
     public Card playerLastCardB = null;
 
+    private List<string> pendingAchievementNotifications = new List<string>();
+
     void Awake()
     {
         Instance = this;
@@ -483,6 +485,24 @@ public class MemoryGameManager : MonoBehaviour
 
 
         PlayerPrefs.SetInt("LastGame_Completed", 0);
+        PlayerPrefs.SetInt("LastGame_AchievementPending", 0);
+        PlayerPrefs.Save();
+
+        // Achievements
+        if (difficulty == 0)
+            UpdateAchievementCounter("Achievements_EasyPlayed", 1);
+        else if (difficulty == 1)
+        {
+            UpdateAchievementCounter("Achievements_MediumPlayed", 1);
+            if (wonVsAI)
+                UpdateAchievementCounter("Achievements_MediumWon", 2);
+        }
+        else if (difficulty == 2)
+        {
+            UpdateAchievementCounter("Achievements_HardPlayed", 1);
+            if (wonVsAI)
+                UpdateAchievementCounter("Achievements_HardWon", 2);
+        }
         PlayerPrefs.Save();
 
         // Verifica daca vreun challenge a fost completat
@@ -522,6 +542,14 @@ public class MemoryGameManager : MonoBehaviour
             delay += 2f;
         }
 
+        foreach (string msg in pendingAchievementNotifications)
+        {
+            string localMsg = msg;
+            DOVirtual.DelayedCall(delay, () => ShowChallengeNotification(localMsg));
+            delay += 2f;
+        }
+        pendingAchievementNotifications.Clear();
+
         DOVirtual.DelayedCall(delay, () =>
         {
             gameOverPanel.SetActive(true);
@@ -536,7 +564,7 @@ public class MemoryGameManager : MonoBehaviour
         PlayerPrefs.SetInt("LastGame_Difficulty", difficulty);
         PlayerPrefs.SetInt("LastGame_WonVsAI", wonVsAI ? 1 : 0);
         PlayerPrefs.SetInt("LastGame_Completed", 1);
-        PlayerPrefs.Save();
+        PlayerPrefs.SetInt("LastGame_AchievementPending", 0);
 
         SceneManager.LoadScene("MemoryGameScene");
     }
@@ -673,5 +701,28 @@ public class MemoryGameManager : MonoBehaviour
             cg.DOFade(0f, 0.3f).OnComplete(() =>
                 challengeNotificationPanel.SetActive(false));
         });
+    }
+
+    void UpdateAchievementCounter(string key, int hintReward)
+    {
+        int current = PlayerPrefs.GetInt(key, 0) + 1;
+        PlayerPrefs.SetInt(key, current);
+
+        int[] thresholds = { 10, 50, 100, 150, 200 };
+        foreach (int threshold in thresholds)
+        {
+            string reachedKey = key + "_Reached_" + threshold;
+            if (current >= threshold && PlayerPrefs.GetInt(reachedKey, 0) == 0)
+            {
+                PlayerPrefs.SetInt(reachedKey, 1);
+                PlayerPrefs.SetString(key + "_Date_" + threshold,
+                    System.DateTime.Now.ToString("dd/MM/yyyy"));
+
+                int hints = PlayerPrefs.GetInt("HintsRemaining", 0);
+                hints += hintReward;
+                PlayerPrefs.SetInt("HintsRemaining", hints);
+                pendingAchievementNotifications.Add("Achievement unlocked! +" + hintReward + " hint" + (hintReward > 1 ? "s" : "") + "!");
+            }
+        }
     }
 }
