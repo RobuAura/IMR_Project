@@ -35,6 +35,7 @@ public class MemoryGameManager : MonoBehaviour
     public TextMeshProUGUI timeResultText;
     public Button playAgainButton;
     public Button menuButton;
+    public TextMeshProUGUI bestTimeResultText;
 
     [Header("Hint")]
     public Button hintButton;
@@ -53,6 +54,9 @@ public class MemoryGameManager : MonoBehaviour
     [Header("Challenge Notification")]
     public GameObject challengeNotificationPanel;
     public TextMeshProUGUI challengeNotificationText;
+
+    [Header("Flags")]
+    public FlagDatabase flagDatabase;
 
     private int hintsRemaining = 3;
     private List<Card> hintedCards = new List<Card>();
@@ -134,6 +138,11 @@ public class MemoryGameManager : MonoBehaviour
 
         if (!isPlayerTurn && vsComputer)
             aiPlayer.StartTurn();
+
+        if (vsComputer)
+            bestTimeResultText.gameObject.SetActive(false);
+        else
+            bestTimeResultText.gameObject.SetActive(true);
     }
 
     void Update()
@@ -154,7 +163,7 @@ public class MemoryGameManager : MonoBehaviour
 
         if (!vsComputer)
         {
-            turnText.gameObject.SetActive(false);
+            turnText.text = "";
             return;
         }
 
@@ -190,13 +199,31 @@ public class MemoryGameManager : MonoBehaviour
         int totalCards = rows * cols;
         int totalPairs = totalCards / 2;
 
+        // Alege steagurile in functie de dificultate
+        List<FlagData> availableFlags = new List<FlagData>();
+        if (difficulty == 0) availableFlags = new List<FlagData>(flagDatabase.easyFlags);
+        else if (difficulty == 1) availableFlags = new List<FlagData>(flagDatabase.mediumFlags);
+        else availableFlags = new List<FlagData>(flagDatabase.hardFlags);
+
+        // Amesteca steagurile si alege totalPairs
+        for (int i = availableFlags.Count - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            FlagData temp = availableFlags[i];
+            availableFlags[i] = availableFlags[randomIndex];
+            availableFlags[randomIndex] = temp;
+        }
+        availableFlags = availableFlags.GetRange(0, totalPairs);
+
+        // Creeaza lista de ID-uri cu perechi
         List<int> cardIds = new List<int>();
-        for (int i = 1; i <= totalPairs; i++)
+        for (int i = 0; i < totalPairs; i++)
         {
             cardIds.Add(i);
             cardIds.Add(i);
         }
 
+        // Amesteca ID-urile
         for (int i = cardIds.Count - 1; i > 0; i--)
         {
             int randomIndex = Random.Range(0, i + 1);
@@ -205,22 +232,25 @@ public class MemoryGameManager : MonoBehaviour
             cardIds[randomIndex] = temp;
         }
 
+        // Instantiaza cartile
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, gridLayoutGroup.transform);
             cardObj.name = "Card_" + i;
 
             Card card = cardObj.GetComponent<Card>();
-            card.SetCard(cardIds[i]);
+            int flagIndex = cardIds[i];
+            card.SetCard(flagIndex, availableFlags[flagIndex].flagSprite, availableFlags[flagIndex].countryName);
         }
-
-        Debug.Log($"Generated {totalCards} cards ({rows}x{cols}) with {totalPairs} pairs");
     }
 
     public void OnCardSelected(Card card)
     {
         if (!canSelect) return;
         if (vsComputer && !isPlayerTurn) return; // blocheaza jucatorul in tura AI
+
+        if (!vsComputer && turnText != null)
+            turnText.text = card.CountryName;
 
         if (!hintedCards.Contains(card))
             ResetHints();
@@ -389,6 +419,9 @@ public class MemoryGameManager : MonoBehaviour
                 firstCard.FlipToBack();
                 secondCard.FlipToBack();
 
+                if (!vsComputer && turnText != null)
+                    turnText.text = "";
+
                 firstCard = null;
                 secondCard = null;
                 canSelect = true;
@@ -452,6 +485,26 @@ public class MemoryGameManager : MonoBehaviour
     {
         int minutes = Mathf.FloorToInt(timeElapsed / 60f);
         int seconds = Mathf.FloorToInt(timeElapsed % 60f);
+
+        if (!vsComputer && turnText != null)
+            turnText.text = "";
+
+        string bestTimeKey = "BestTime_" + difficulty;
+        int currentTimeSeconds = (int)timeElapsed;
+        int savedBestTime = PlayerPrefs.GetInt(bestTimeKey, int.MaxValue);
+
+        if (currentTimeSeconds < savedBestTime)
+        {
+            PlayerPrefs.SetInt(bestTimeKey, currentTimeSeconds);
+            PlayerPrefs.Save();
+            bestTimeResultText.text = "New Best Time!";
+        }
+        else
+        {
+            int bestMinutes = savedBestTime / 60;
+            int bestSeconds = savedBestTime % 60;
+            bestTimeResultText.text = string.Format("Best Time: {0:00}:{1:00}", bestMinutes, bestSeconds);
+        }
 
         if (vsComputer)
         {

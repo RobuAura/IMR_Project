@@ -8,6 +8,7 @@ public class Card : MonoBehaviour
     [Header("References")]
     public GameObject frontFace;
     public TextMeshProUGUI cardNumberText;
+    public Image flagImage;
 
     public int CardId { get; private set; } = -1;
     public bool IsFlipped { get; private set; } = false;
@@ -15,6 +16,8 @@ public class Card : MonoBehaviour
     private bool isFlipping = false;
 
     private Color originalColor;
+
+    public string CountryName { get; private set; } = "";
 
     void Awake()
     {
@@ -26,10 +29,23 @@ public class Card : MonoBehaviour
         GetComponent<Image>().color = highlighted ? highlightColor : originalColor;
     }
 
-    public void SetCard(int id)
+    public void SetCard(int id, Sprite flagSprite = null, string countryName = "")
     {
         CardId = id;
-        cardNumberText.text = id.ToString();
+        CountryName = countryName;
+
+        if (flagSprite != null)
+        {
+            flagImage.sprite = flagSprite;
+            flagImage.gameObject.SetActive(true);
+            cardNumberText.gameObject.SetActive(false);
+        }
+        else
+        {
+            flagImage.gameObject.SetActive(false);
+            cardNumberText.gameObject.SetActive(true);
+            cardNumberText.text = id.ToString();
+        }
     }
 
     public void OnCardClicked()

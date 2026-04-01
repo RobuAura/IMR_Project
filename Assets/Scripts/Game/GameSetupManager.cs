@@ -17,6 +17,9 @@ public class GameSetupManager : MonoBehaviour
     public float clickScale = 1.08f;
     public float clickDuration = 0.12f;
 
+    [Header("Best Time")]
+    public TextMeshProUGUI bestTimeText;
+
     // Difficulty indices matching the dropdown order
     private const int EASY = 0;
     private const int MEDIUM = 1;
@@ -47,6 +50,8 @@ public class GameSetupManager : MonoBehaviour
         vsCanvasGroup.alpha = 1f;
         vsCanvasGroup.interactable = true;
         vsCanvasGroup.blocksRaycasts = true;
+
+        UpdateBestTimeDisplay(difficultyDropdown.value);
     }
 
     void OnDifficultyChanged(int index)
@@ -72,7 +77,10 @@ public class GameSetupManager : MonoBehaviour
         }
 
         Debug.Log($"Difficulty changed to: {difficultyDropdown.options[index].text}");
+
+        UpdateBestTimeDisplay(index);
     }
+
 
     public void OnStartButtonClicked()
     {
@@ -113,5 +121,18 @@ public class GameSetupManager : MonoBehaviour
         Sequence seq = DOTween.Sequence();
         seq.Append(button.transform.DOScale(originalScale * clickScale, clickDuration).SetEase(Ease.OutQuad));
         seq.Append(button.transform.DOScale(originalScale, clickDuration).SetEase(Ease.InQuad));
+    }
+
+    void UpdateBestTimeDisplay(int difficulty)
+    {
+        int bestTime = PlayerPrefs.GetInt("BestTime_" + difficulty, -1);
+        if (bestTime == -1)
+            bestTimeText.text = "Best Time: --:--";
+        else
+        {
+            int minutes = bestTime / 60;
+            int seconds = bestTime % 60;
+            bestTimeText.text = string.Format("Best Time {0:00}:{1:00}", minutes, seconds);
+        }
     }
 }

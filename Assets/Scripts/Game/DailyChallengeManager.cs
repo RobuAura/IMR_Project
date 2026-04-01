@@ -161,9 +161,9 @@ public class DailyChallengeManager : MonoBehaviour
             rewardGiven = true;
             PlayerPrefs.SetInt("DailyChallenge_RewardGiven", 1);
 
-            // Adauga 2 hinturi
+            // Adauga 5 hinturi
             int hints = PlayerPrefs.GetInt("HintsRemaining", 0);
-            hints += 2;
+            hints += 5;
             PlayerPrefs.SetInt("HintsRemaining", hints);
             PlayerPrefs.Save();
 
