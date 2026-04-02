@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 116935519}
   - component: {fileID: 116935518}
   - component: {fileID: 116935520}
+  - component: {fileID: 116935521}
   m_Layer: 5
   m_Name: 'AnswerButton3 '
   m_TagString: Untagged
@@ -252,6 +253,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &116935521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116935516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &295054164
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,6 +280,7 @@ GameObject:
   - component: {fileID: 295054167}
   - component: {fileID: 295054166}
   - component: {fileID: 295054165}
+  - component: {fileID: 295054169}
   m_Layer: 5
   m_Name: RetryButton
   m_TagString: Untagged
@@ -385,6 +402,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 500}
   m_SizeDelta: {x: 500, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &295054169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295054164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &359092300
 GameObject:
   m_ObjectHideFlags: 0
@@ -1367,6 +1399,7 @@ GameObject:
   - component: {fileID: 956764714}
   - component: {fileID: 956764713}
   - component: {fileID: 956764715}
+  - component: {fileID: 956764716}
   m_Layer: 5
   m_Name: 'AnswerButton2 '
   m_TagString: Untagged
@@ -1488,6 +1521,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &956764716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956764711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &961648750
 GameObject:
   m_ObjectHideFlags: 0
@@ -2562,6 +2610,9 @@ MonoBehaviour:
     - 4,776 meters
     correctAnswerIndex: 1
   questionsPerQuiz: 10
+  correctPulseDuration: 0.4
+  wrongShakeDuration: 0.5
+  shakeStrength: 20
 --- !u!4 &1217149248
 Transform:
   m_ObjectHideFlags: 0
@@ -2589,6 +2640,7 @@ GameObject:
   - component: {fileID: 1392866743}
   - component: {fileID: 1392866742}
   - component: {fileID: 1392866741}
+  - component: {fileID: 1392866744}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -2710,6 +2762,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392866739}
   m_CullTransparentMesh: 1
+--- !u!114 &1392866744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392866739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1449887550
 GameObject:
   m_ObjectHideFlags: 0
@@ -2722,6 +2789,7 @@ GameObject:
   - component: {fileID: 1449887553}
   - component: {fileID: 1449887552}
   - component: {fileID: 1449887554}
+  - component: {fileID: 1449887555}
   m_Layer: 5
   m_Name: NextButton
   m_TagString: Untagged
@@ -2843,6 +2911,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1449887555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449887550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1543843504
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,6 +2938,7 @@ GameObject:
   - component: {fileID: 1543843507}
   - component: {fileID: 1543843506}
   - component: {fileID: 1543843508}
+  - component: {fileID: 1543843509}
   m_Layer: 5
   m_Name: AnswerButton1
   m_TagString: Untagged
@@ -2976,6 +3060,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1543843509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543843504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1632107862
 GameObject:
   m_ObjectHideFlags: 0
@@ -2988,6 +3087,7 @@ GameObject:
   - component: {fileID: 1632107865}
   - component: {fileID: 1632107864}
   - component: {fileID: 1632107863}
+  - component: {fileID: 1632107867}
   m_Layer: 5
   m_Name: BackToMenuButton
   m_TagString: Untagged
@@ -3109,6 +3209,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 300}
   m_SizeDelta: {x: 500, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1632107867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632107862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1691233115
 GameObject:
   m_ObjectHideFlags: 0

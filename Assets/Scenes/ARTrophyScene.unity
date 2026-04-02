@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 865591527}
   - component: {fileID: 865591526}
   - component: {fileID: 865591525}
+  - component: {fileID: 865591528}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -373,6 +374,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 865591523}
   m_CullTransparentMesh: 1
+--- !u!114 &865591528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 865591523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &929997897
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,8 +517,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trophyPrefab: {fileID: 3873847163066426910, guid: 87541eaa50f922541b2492ee6c15c1ab, type: 3}
   instructionText: {fileID: 1428549790}
+  spawnDelay: 0.7
   scaleAnimationDuration: 1.2
-  rotationAnimationDuration: 1.5
   scaleEase: 24
 --- !u!1 &1295323944
 GameObject:
